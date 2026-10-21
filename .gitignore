@@ -1,0 +1,26 @@
+# Data: never commit raw or processed datasets (Kaggle rules, size)
+data/
+*.csv
+*.parquet
+*.zip
+
+# Model artifacts and experiment outputs
+models/
+artifacts/
+*.pkl
+*.joblib
+mlruns/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+.pytest_cache/
+.ipynb_checkpoints/
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/
