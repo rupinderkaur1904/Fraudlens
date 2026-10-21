@@ -29,17 +29,22 @@ Raw files are never committed. Expected local path: `data/raw/`.
 | Kaggle test file | starts 30 days after train ends, spans 183 days |
 | pandas memory, default dtypes | about 2.2 GB for the transaction table |
 
-Fraud rate by 30-day block (block 6 is only 2 days):
+Fraud rate by 30-day period, with `day = (TransactionDT - min(TransactionDT)) // 86400`
+(day 0 = first transaction; period 6 is only 2 days):
 
-| Days | Rows | Frauds | Fraud rate |
-| --- | --- | --- | --- |
-| 0-29 | 130,968 | 3,243 | 2.48% |
-| 30-59 | 89,838 | 3,627 | 4.04% |
-| 60-89 | 91,768 | 3,700 | 4.03% |
-| 90-119 | 98,027 | 3,849 | 3.93% |
-| 120-149 | 85,303 | 2,962 | 3.47% |
-| 150-179 | 86,525 | 2,943 | 3.40% |
-| 180-181 | 8,111 | 339 | 4.18% |
+| Period | Days | Rows | Frauds | Fraud rate |
+| --- | --- | --- | --- | --- |
+| 0 | 0-29 | 134,339 | 3,401 | 2.53% |
+| 1 | 30-59 | 89,399 | 3,577 | 4.00% |
+| 2 | 60-89 | 92,189 | 3,724 | 4.04% |
+| 3 | 90-119 | 98,615 | 3,898 | 3.95% |
+| 4 | 120-149 | 83,571 | 2,850 | 3.41% |
+| 5 | 150-179 | 86,934 | 2,972 | 3.42% |
+| 6 | 180-181 | 5,493 | 241 | 4.39% |
+
+Correction (2026-10-21): the first draft computed day as `TransactionDT // 86400` without
+subtracting the minimum (86,400), which shifted every period boundary by one day. Totals were
+unaffected.
 
 The first month has more transactions and a lower fraud rate than the rest. This is a sign of
 seasonality or drift (**assumption**: a holiday period) and matters for the split.
@@ -62,7 +67,7 @@ Consequences:
 ## Timestamp
 
 `TransactionDT` (int, seconds). **Organiser:** a time delta from a hidden reference datetime, not a
-real timestamp. Day number = `TransactionDT // 86400`. Hour of day = `(TransactionDT // 3600) % 24`
+real timestamp. Day number = `(TransactionDT - min(TransactionDT)) // 86400`, with the minimum (86,400) taken from the training file. Hour of day = `((TransactionDT - 86400) // 3600) % 24`
 (**assumption**: the reference is midnight in some timezone, so hour is only relative).
 
 ## Field groups
